@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Flappy Bird</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,15 +11,31 @@
     <div class="canvas-container">
       <canvas id="gameCanvas" width="400" height="600"></canvas>
 
-      <div id="readyOverlay" class="overlay overlay-ready">
+      <div id="readyOverlay" class="overlay">
         <div class="overlay-box">
           <h1 class="overlay-title">Get Ready!</h1>
+          <div class="color-selector">
+            <span class="color-label">Bird Color</span>
+            <div class="color-options">
+              <button class="color-circle active" data-color="#f5c842" style="background:#f5c842" title="Yellow"></button>
+              <button class="color-circle" data-color="#e74c3c" style="background:#e74c3c" title="Red"></button>
+              <button class="color-circle" data-color="#3498db" style="background:#3498db" title="Blue"></button>
+              <button class="color-circle" data-color="#2ecc71" style="background:#2ecc71" title="Green"></button>
+            </div>
+          </div>
           <p class="instruction">Click or Press Space</p>
           <p class="best-score">Best: <span id="readyHighScore">0</span></p>
         </div>
       </div>
 
-      <div id="gameOverOverlay" class="overlay overlay-gameover">
+      <div id="pausedOverlay" class="overlay">
+        <div class="overlay-box">
+          <h1 class="overlay-title">Paused</h1>
+          <p class="instruction">Press <kbd>P</kbd> to Resume</p>
+        </div>
+      </div>
+
+      <div id="gameOverOverlay" class="overlay">
         <div class="overlay-box">
           <h1 class="overlay-title game-over-title">Game Over</h1>
           <div class="score-summary">
@@ -33,6 +49,12 @@
 
       <div id="scoreDisplay" class="score-top">
         <span id="score">0</span>
+      </div>
+
+      <div class="top-buttons">
+        <button id="pauseBtn" class="icon-btn" title="Pause (P)">⏸</button>
+        <button id="fullscreenBtn" class="icon-btn" title="Fullscreen">⛶</button>
+        <button id="soundBtn" class="icon-btn" title="Toggle Sound">🔊</button>
       </div>
     </div>
   </div>

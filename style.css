@@ -11,7 +11,9 @@ body {
   align-items: center;
   height: 100vh;
   overflow: hidden;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .game-wrapper {
@@ -36,35 +38,52 @@ canvas {
   left: 0;
   width: 100%;
   height: 100%;
-  display: none;
+  display: flex;
   justify-content: center;
   align-items: center;
   z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
   border-radius: 8px;
 }
 
-.overlay-ready {
+.overlay.visible {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.overlay.visible > * {
+  pointer-events: auto;
+}
+
+#readyOverlay {
   background: rgba(0, 0, 0, 0.2);
 }
 
-.overlay-gameover {
+#pausedOverlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+#gameOverOverlay {
   background: rgba(0, 0, 0, 0.55);
 }
 
 .overlay-box {
   background: rgba(0, 0, 0, 0.25);
   border-radius: 12px;
-  padding: 40px 50px;
+  padding: 36px 48px;
   text-align: center;
   backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .overlay-title {
-  font-size: 40px;
+  font-size: 38px;
   font-weight: bold;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .game-over-title {
@@ -77,14 +96,64 @@ canvas {
   margin-top: 10px;
 }
 
+.instruction kbd {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
 .best-score {
   font-size: 18px;
   color: #aaa;
   margin-top: 14px;
 }
 
+.color-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+.color-label {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.color-options {
+  display: flex;
+  gap: 10px;
+}
+
+.color-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  outline: none;
+  padding: 0;
+}
+
+.color-circle:hover {
+  transform: scale(1.12);
+}
+
+.color-circle.active {
+  border-color: white;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
 .score-summary {
-  margin: 20px 0 24px;
+  margin: 18px 0 22px;
 }
 
 .score-line {
@@ -112,6 +181,7 @@ canvas {
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
   box-shadow: 0 3px 0 #2d6a30;
+  outline: none;
 }
 
 .restart-btn:hover {
@@ -129,8 +199,13 @@ canvas {
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  display: none;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.score-top.visible {
+  opacity: 1;
 }
 
 .score-top span {
@@ -138,4 +213,69 @@ canvas {
   font-weight: bold;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.top-buttons {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 30;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  outline: none;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 440px) {
+  .game-wrapper {
+    max-width: 100vw;
+    border-radius: 0;
+  }
+  .canvas-container, canvas {
+    max-width: 100vw;
+    border-radius: 0;
+  }
+  .overlay {
+    border-radius: 0;
+  }
+  .overlay-box {
+    padding: 28px 32px;
+  }
+  .overlay-title {
+    font-size: 30px;
+  }
+  .score-top span {
+    font-size: 36px;
+  }
+}
+
+@media (max-height: 620px) {
+  .game-wrapper {
+    transform: scale(0.75);
+    transform-origin: center center;
+  }
 }
