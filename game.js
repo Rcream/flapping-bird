@@ -81,6 +81,8 @@ class Particle {
 class Bird {
   constructor(colorKey) {
     this.colorKey = colorKey;
+    this.wingAngle = 0;
+    this.wingAngularVel = 0;
     this.reset();
   }
 
@@ -90,6 +92,8 @@ class Bird {
     this.vel = 0;
     this.rotation = 0;
     this.size = BIRD_SIZE;
+    this.wingAngle = 0;
+    this.wingAngularVel = 0;
   }
 
   setColor(colorKey) {
@@ -98,9 +102,10 @@ class Bird {
 
   flap() {
     this.vel = FLAP_VELOCITY;
+    this.wingAngularVel = -14;
   }
 
-  update() {
+  update(gameState) {
     this.vel += GRAVITY;
     this.y += this.vel;
 
@@ -111,6 +116,48 @@ class Bird {
     } else {
       this.rotation *= 0.9;
     }
+
+    if (gameState === STATE_READY) {
+      this.wingAngle = Math.sin(performance.now() * 0.004) * 16;
+    } else if (gameState === STATE_PLAYING) {
+      let target = 0;
+      if (this.vel < -1) {
+        target = -44;
+      } else if (this.vel > 2.5) {
+        target = 28;
+      }
+      this.wingAngularVel += (target - this.wingAngle) * 0.12;
+      this.wingAngularVel *= 0.88;
+      this.wingAngle += this.wingAngularVel;
+    }
+  }
+
+  drawWings() {
+    const { body, stroke } = BIRD_COLORS[this.colorKey];
+
+    ctx.save();
+    ctx.translate(-this.size / 2 - 1, 0);
+    ctx.rotate((this.wingAngle * Math.PI) / 180);
+    ctx.fillStyle = body;
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(0, -9, 5, 14, 0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(this.size / 2 + 1, 0);
+    ctx.rotate((this.wingAngle * Math.PI) / 180);
+    ctx.fillStyle = body;
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(0, -9, 5, 14, -0.1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 
   draw() {
@@ -120,11 +167,15 @@ class Bird {
     ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
     ctx.rotate((this.rotation * Math.PI) / 180);
 
+    this.drawWings();
+
     ctx.fillStyle = body;
     ctx.strokeStyle = stroke;
     ctx.lineWidth = 2;
-    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
-    ctx.strokeRect(-this.size / 2, -this.size / 2, this.size, this.size);
+    ctx.beginPath();
+    ctx.roundRect(-this.size / 2, -this.size / 2, this.size, this.size, 4);
+    ctx.fill();
+    ctx.stroke();
 
     ctx.fillStyle = 'white';
     ctx.beginPath();
@@ -427,11 +478,12 @@ class Game {
     if (this.state === STATE_READY) {
       this.hoverAngle += 0.03;
       this.bird.y = this.hoverBaseY + Math.sin(this.hoverAngle) * 8;
+      this.bird.update(STATE_READY);
       return;
     }
 
     if (this.state === STATE_PLAYING) {
-      this.bird.update();
+      this.bird.update(STATE_PLAYING);
 
       for (const p of this.particles) {
         p.update();
@@ -545,6 +597,19 @@ class Game {
       ctx.fillRect(i, H - GROUND_HEIGHT - 4, 3, 12);
     }
   }
+}
+
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    if (r > w / 2) r = w / 2;
+    if (r > h / 2) r = h / 2;
+    this.moveTo(x + r, y);
+    this.arcTo(x + w, y, x + w, y + h, r);
+    this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r);
+    this.arcTo(x, y, x + w, y, r);
+    return this;
+  };
 }
 
 const game = new Game();
